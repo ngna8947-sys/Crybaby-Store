@@ -73,7 +73,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 os.remove(p)
         await context.bot.delete_message(chat_id=update.message.chat_id, message_id=status_msg.message_id)
 
-app = ApplicationBuilder().token("8846112799:AAHXZF3auIn47a9MsK0kLmAzY6BkOrEJYvQ").build()
+app = ApplicationBuilder().token("8846112799:AAGWArM1ySQMXIcm2X42O759sPpz5JYrLkE").build()
 app.add_handler(MessageHandler(filters.VIDEO | filters.Document.VIDEO, handle_video))
 
 print("🤖 Bot កំពុងដំណើរការ...")
