@@ -5,6 +5,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 from gtts import gTTS
 
+# 🔑 Gemini API Key របស់អ្នក
 client = genai.Client(api_key="AQ.Ab8RN6IqaNoAhTylGhgIPgvzHxrdr_TK-DoIqQh_95rDha79mQ")
 
 def translate_audio_with_gemini(audio_file_path):
@@ -23,14 +24,18 @@ def process_video_dubbing(input_video_path, output_video_path):
     khmer_audio = "khmer_voice.mp3"
 
     try:
+        # ១. ស្រង់សំឡេងចេញពីវីដេអូដើម
         extract_cmd = ['ffmpeg', '-y', '-i', input_video_path, '-q:a', '0', '-map', 'a', extracted_audio]
         subprocess.run(extract_cmd, check=True)
 
+        # ២. ប្រើប្រាស់ Gemini API បកប្រែជាអត្ថបទខ្មែរ
         khmer_text = translate_audio_with_gemini(extracted_audio)
 
+        # ៣. បម្លែងជាសំឡេងនិយាយខ្មែរ (TTS)
         tts = gTTS(text=khmer_text, lang='km', slow=False)
         tts.save(khmer_audio)
 
+        # ៤. យកសំឡេងខ្មែរថ្មី ទៅបដិសេធសំឡេងចាស់ដោយរក្សាវីដេអូដើមទាំងស្រុង (-c:v copy)
         merge_cmd = [
             'ffmpeg', '-y', '-i', input_video_path, '-i', khmer_audio,
             '-c:v', 'copy',
@@ -73,7 +78,10 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 os.remove(p)
         await context.bot.delete_message(chat_id=update.message.chat_id, message_id=status_msg.message_id)
 
-app = ApplicationBuilder().token("8846112799:AAGWArM1ySQMXIcm2X42O759sPpz5JYrLkE").build()
+# 🚀 Telegram Bot Token ថ្មីរបស់អ្នក
+TELEGRAM_BOT_TOKEN = "8846112799:AAGWArM1ySQMXIcm2X42O759sPpz5JYrLkE"
+
+app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.VIDEO | filters.Document.VIDEO, handle_video))
 
 print("🤖 Bot កំពុងដំណើរការ...")
